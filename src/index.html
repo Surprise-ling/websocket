@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+        }
+        ul {
+            flex-direction: column;
+            justify-content: center;
+        }
+        li {
+            list-style: none;
+        }
+        .box {
+            width: auto;
+            height: 600px;
+            border: 1px solid red;
+            display: flex;
+            justify-content: space-around;
+        }
+        .item {
+            width: 300px;
+            height: 200px;
+            border: 1px solid rebeccapurple;
+            align-self: center;
+            /* overflow: hidden; */
+            /* white-space: nowrap; */
+        }
+        .panel {
+            width: 300px;
+            height: 200px;
+            border: 1px solid slategray;
+            text-align: right;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="item">
+            <h2>websocket正在建立连接...</h2>
+            <div class="panel">
+                <ul>
+                </ul>
+            </div>
+            聊天输入：<input type="text" id="user" name="user">
+            <br>
+            <button type="submit" onclick="connection('two', 0)">发送聊天</button>
+        </div>
+    </div>
+    <script>
+        // 建立连接
+        let user = '',user1 = null
+        user = Math.random() * 100
+        user = parseInt(user)
+        console.log(user)
+        if (user > 50) {
+            user1 = '小张'
+        } else {
+            user1 = '小明'
+        }
+        let ws = new WebSocket('ws://localhost:8001')
+            // websocket建立连接
+            ws.onopen = (e) => {
+                console.log('连接服务器成功')
+            }
+            // websocket连接关闭
+            ws.onclose = (e) => {
+                console.log('服务器关闭')
+            }
+            // websocket服务器通信报错
+            ws.onerror = (e) => {
+                console.log('服务器报错')
+            }
+            // 客户端接收服务器数据
+            ws.onmessage = function(e) {
+                console.log(e)
+                let head = document.getElementsByTagName('h2')
+                head[0].innerHTML = user1
+                let inputValue = document.getElementsByTagName('input')[0]
+                let mess = document.getElementsByTagName('ul')[0]
+                if(e.data !== '') {
+                    inputValue.value = ''
+                    let list = document.createElement('li')
+                    list.innerText = e.data
+                    mess.style.textAlign = 'right'
+                    mess.appendChild(list)
+                }
+            }
+        function connection() {
+            let mess = document.getElementsByTagName('input')[0].value
+            ws.send(user1 + '：' + mess)
+        }
+    </script>
+</body>
+</html>
